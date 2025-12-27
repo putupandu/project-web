@@ -1,4 +1,3 @@
-// File: backend/cmd/api/main.go
 package main
 
 import (
@@ -27,17 +26,20 @@ func main() {
 	// Initialize repositories
 	bookRepo := repositories.NewBookRepository(db)
 	categoryRepo := repositories.NewCategoryRepository(db)
+	userRepo := repositories.NewUserRepository(db)
 
 	// Initialize services
 	bookService := services.NewBookService(bookRepo, categoryRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
 	searchService := services.NewSearchService(bookRepo)
+	userService := services.NewUserService(userRepo)
 
 	// Initialize handlers
 	bookHandler := handlers.NewBookHandler(bookService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	searchHandler := handlers.NewSearchHandler(searchService)
 	healthHandler := handlers.NewHealthHandler()
+	userHandler := handlers.NewUserHandler(userService)
 
 	// Setup router
 	router := mux.NewRouter()
@@ -70,17 +72,29 @@ func main() {
 	// Category routes
 	api.HandleFunc("/categories", categoryHandler.GetAllCategories).Methods("GET")
 	api.HandleFunc("/categories/{id}", categoryHandler.GetCategoryByID).Methods("GET")
+	api.HandleFunc("/categories/{id}", categoryHandler.DeleteCategory).Methods("DELETE")
+	api.HandleFunc("/categories", categoryHandler.CreateCategory).Methods("POST")
 
 	// Search route
 	api.HandleFunc("/search", searchHandler.Search).Methods("GET")
 
+	// User routes
+	api.HandleFunc("/users", userHandler.GetAllUsers).Methods("GET")
+	api.HandleFunc("/users", userHandler.CreateUser).Methods("POST")
+	api.HandleFunc("/users/{id}", userHandler.GetUserByID).Methods("GET")
+	api.HandleFunc("/users/{id}", userHandler.UpdateUser).Methods("PUT")
+	api.HandleFunc("/users/{id}", userHandler.DeleteUser).Methods("DELETE")
+
 	// Serve static files (uploads)
+	// IMPORTANT: this path is relative to the process working dir.
+	// If you run the binary from backend/ use "./uploads"
 	router.PathPrefix("/uploads/").Handler(
 		http.StripPrefix("/uploads/",
 			http.FileServer(http.Dir("./uploads"))))
 
 	// Start server
-	addr := ":" + cfg.Port
-	log.Printf("Server starting on port %s...", cfg.Port)
-	log.Fatal(http.ListenAndServe(addr, router))
+	addr := "0.0.0.0:" + cfg.Port
+log.Printf("Server starting on %s...", addr)
+log.Fatal(http.ListenAndServe(addr, router))
+
 }

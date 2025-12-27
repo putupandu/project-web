@@ -1,13 +1,16 @@
 package handlers
 
 import (
-    "e-library/backend/internal/models"
-    "e-library/backend/internal/services"
-    "e-library/backend/internal/utils"
-    "net/http"
-    "strconv"
+	"e-library/backend/internal/models"
+	"e-library/backend/internal/services"
+	"e-library/backend/internal/utils"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+	"encoding/json"
 
-    "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
 
 
@@ -54,4 +57,57 @@ func (h *CategoryHandler) GetCategoryByID(w http.ResponseWriter, r *http.Request
 		Message: "Category retrieved successfully",
 		Data:    category,
 	})
+}
+
+func (h *CategoryHandler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.categoryService.DeleteCategory(id); err != nil {
+		log.Printf("Delete category error: %v", err)
+		http.Error(w, "Failed to delete category", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *CategoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Name        string `json:"name"`
+		Description string `json:"description,omitempty"`
+		Slug        string `json:"slug,omitempty"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Jika slug kosong, buat dari name
+	slug := req.Slug
+	if slug == "" {
+		slug = strings.ToLower(strings.ReplaceAll(req.Name, " ", "-"))
+	}
+
+	category := &models.Category{
+		Name:        req.Name,
+		Description: req.Description,
+		Slug:        slug,
+	}
+
+	newCat, err := h.categoryService.CreateCategory(category)
+	if err != nil {
+		log.Printf("Create category error: %v", err)
+		http.Error(w, "Failed to create category", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newCat)
 }

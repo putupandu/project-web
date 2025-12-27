@@ -77,7 +77,7 @@ const Home = () => {
             <div>
               <p className="text-gray-600 text-sm mb-1">Total Buku</p>
               <p className="text-3xl font-bold text-blue-600">
-                {latestBooks.length > 0 ? '500+' : '0'}
+                {latestBooks.length > 0 ? '2' : '0'}
               </p>
             </div>
             <Book className="text-blue-600" size={40} />
@@ -98,7 +98,7 @@ const Home = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1">Total Unduhan</p>
-              <p className="text-3xl font-bold text-purple-600">10K+</p>
+              <p className="text-3xl font-bold text-purple-600">0</p>
             </div>
             <TrendingUp className="text-purple-600" size={40} />
           </div>
