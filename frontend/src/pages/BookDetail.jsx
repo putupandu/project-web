@@ -30,10 +30,10 @@ const BookDetail = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Increment view count
       await bookService.view(id);
-      
+
       // Fetch book details
       const response = await bookService.getById(id);
       setBook(response.data);
@@ -48,12 +48,12 @@ const BookDetail = () => {
     try {
       setDownloading(true);
       await bookService.download(id);
-      
+
       // Trigger actual download
-      if (book.file_url) {
+      if (book?.file_url) {
         window.open(book.file_url, '_blank');
       }
-      
+
       // Update download count in UI
       setBook((prev) => ({
         ...prev,
@@ -64,6 +64,37 @@ const BookDetail = () => {
     } finally {
       setDownloading(false);
     }
+  };
+
+  const handleViewOnline = () => {
+    if (book?.file_url) {
+      window.open(book.file_url, '_blank');
+    }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: book.title,
+          text: `Baca buku: ${book.title} oleh ${book.author}`,
+          url: window.location.href,
+        });
+      } catch (err) {
+        // Fallback: copy URL
+        navigator.clipboard.writeText(window.location.href);
+        alert('Tautan disalin ke clipboard!');
+      }
+    } else {
+      // Fallback for non-supporting browsers
+      navigator.clipboard.writeText(window.location.href);
+      alert('Tautan disalin ke clipboard!');
+    }
+  };
+
+  const handleSave = () => {
+    // Placeholder: simpan ke localStorage atau API nanti
+    alert('Fitur simpan belum diimplementasi.');
   };
 
   if (loading) return <Loading message="Memuat detail buku..." />;
@@ -89,7 +120,7 @@ const BookDetail = () => {
               <div className="aspect-[3/4] bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg overflow-hidden shadow-xl mb-4">
                 {book.cover ? (
                   <img
-                    src={book.cover}
+                    src={`${book.cover}`}
                     alt={book.title}
                     className="w-full h-full object-cover"
                   />
@@ -111,17 +142,27 @@ const BookDetail = () => {
                   {downloading ? 'Mengunduh...' : 'Download PDF'}
                 </button>
 
-                <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center">
+                <button
+                  onClick={handleViewOnline}
+                  disabled={!book.file_url}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <Eye size={20} className="mr-2" />
                   Baca Online
                 </button>
 
                 <div className="flex space-x-2">
-                  <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center">
+                  <button
+                    onClick={handleSave}
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center"
+                  >
                     <Bookmark size={18} className="mr-1" />
                     Simpan
                   </button>
-                  <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center">
+                  <button
+                    onClick={handleShare}
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center"
+                  >
                     <Share2 size={18} className="mr-1" />
                     Bagikan
                   </button>
@@ -226,7 +267,8 @@ const BookDetail = () => {
             {/* Related Info */}
             <div className="border-t pt-6">
               <p className="text-sm text-gray-500">
-                Dipublikasikan pada {new Date(book.created_at).toLocaleDateString('id-ID', {
+                Dipublikasikan pada{' '}
+                {new Date(book.created_at).toLocaleDateString('id-ID', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',

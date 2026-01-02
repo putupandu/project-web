@@ -24,14 +24,15 @@ const About = () => {
                 Apa itu E-Library?
               </h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                E-Library adalah perpustakaan digital yang dikembangkan oleh Badan Meteorologi, 
-                Klimatologi, dan Geofisika (.) untuk memberikan akses mudah dan cepat terhadap 
-                berbagai publikasi ilmiah, jurnal, makalah, dan dokumen teknis.
+                E-Library adalah platform perpustakaan digital yang dirancang untuk menyediakan akses mudah, 
+                cepat, dan terorganisir terhadap berbagai jenis koleksi digital seperti jurnal ilmiah, 
+                artikel, buku, laporan penelitian, modul pembelajaran, dan dokumen akademik lainnya.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Platform ini dirancang untuk mendukung peneliti, mahasiswa, akademisi, dan masyarakat 
-                umum dalam mengakses informasi terkait meteorologi, klimatologi, geofisika, dan bidang 
-                terkait lainnya.
+                Tujuan utama E-Library adalah mendukung kebutuhan informasi bagi mahasiswa, peneliti, dosen, 
+                pengajar, serta masyarakat umum yang membutuhkan sumber referensi terpercaya secara online.
+                Dengan adanya E-Library, pengguna dapat mencari, membaca, 
+                dan mengunduh berbagai materi digital kapan saja dan di mana saja tanpa batasan fisik.
               </p>
             </div>
           </div>
@@ -46,9 +47,8 @@ const About = () => {
             <h2 className="text-2xl font-bold text-gray-800">Visi</h2>
           </div>
           <p className="text-gray-600 leading-relaxed">
-            Menjadi perpustakaan digital terdepan dalam menyediakan akses informasi ilmiah 
-            di bidang meteorologi, klimatologi, dan geofisika untuk mendukung penelitian 
-            dan pengembangan ilmu pengetahuan.
+            Menjadi platform perpustakaan digital yang modern, aksesibel, dan terpercaya dalam mendukung kegiatan pendidikan, 
+            penelitian, serta pengembangan ilmu pengetahuan secara berkelanjutan.
           </p>
         </div>
 
@@ -60,15 +60,19 @@ const About = () => {
           <ul className="space-y-2 text-gray-600">
             <li className="flex items-start">
               <span className="text-purple-600 mr-2">•</span>
-              <span>Menyediakan akses mudah ke publikasi ilmiah berkualitas</span>
+              <span>Menyediakan akses cepat dan mudah terhadap berbagai koleksi digital yang berkualitas, lengkap, dan relevan.</span>
             </li>
             <li className="flex items-start">
               <span className="text-purple-600 mr-2">•</span>
-              <span>Mendukung kegiatan penelitian dan pendidikan</span>
+              <span>Mendukung proses pembelajaran dan penelitian dengan menyediakan sumber informasi ilmiah yang terstruktur dan dapat diandalkan.</span>
             </li>
             <li className="flex items-start">
               <span className="text-purple-600 mr-2">•</span>
-              <span>Menyebarluaskan hasil penelitian </span>
+              <span>Membangun ekosistem digital yang efisien, sehingga pengguna dapat mencari, membaca, dan mengelola dokumen secara praktis melalui satu platform. </span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-purple-600 mr-2">•</span>
+              <span>Mengoptimalkan teknologi informasi untuk meningkatkan pelayanan perpustakaan dan mempermudah distribusi pengetahuan secara luas. </span>
             </li>
           </ul>
         </div>
@@ -122,20 +126,20 @@ const About = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="text-blue-600 flex-shrink-0 mt-1" size={20} />
                 <div>
-                  <p className="font-semibold">Kantor Pusat </p>
+                  <p className="font-semibold"> Alamat Pusat </p>
                   <p className="text-sm">
-                    Jl. Angkasa I No.2, Kemayoran<br />
-                    Jakarta Pusat 10720<br />
+                    Jl. ZA. Pagar Alam No.9 -11, Labuhan Ratu, Kec. Kedaton<br />
+                    Bandar Lampung 35132<br />
                     Indonesia
                   </p>
-                </div>
+                </div>  
               </div>
 
               <div className="flex items-center space-x-3">
                 <Phone className="text-blue-600 flex-shrink-0" size={20} />
                 <div>
                   <p className="font-semibold">Telepon</p>
-                  <p className="text-sm">(021) 4246321</p>
+                  <p className="text-sm">(021) 82828282</p>
                 </div>
               </div>
 
@@ -143,7 +147,7 @@ const About = () => {
                 <Mail className="text-blue-600 flex-shrink-0" size={20} />
                 <div>
                   <p className="font-semibold">Email</p>
-                  <p className="text-sm">info@bmkg.go.id</p>
+                  <p className="text-sm">uti@teknokrat.ac.id</p>
                 </div>
               </div>
             </div>
@@ -154,7 +158,7 @@ const About = () => {
             <div className="space-y-2 text-gray-600">
               <div className="flex justify-between">
                 <span>Senin - Jumat</span>
-                <span className="font-semibold">08:00 - 16:00 WIB</span>
+                <span className="font-semibold">07:30 - 21:00 WIB</span>
               </div>
               <div className="flex justify-between">
                 <span>Sabtu - Minggu</span>

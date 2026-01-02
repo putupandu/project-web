@@ -1,25 +1,26 @@
 package config
 
 import (
-    "log"
-    "os"
+	"log"
+	"os"
 
-    "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-    DBUrl string
-    Port  string
+	DBUrl string
+	Port  string
 }
 
 func LoadConfig() Config {
-    err := godotenv.Load()
-    if err != nil {
-        log.Println("Warning: .env file not found")
-    }
+	// Karena dijalankan dari cmd/api/, .env ada di ../
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Println("No .env file found")
+	}
 
-    return Config{
-        DBUrl: os.Getenv("DATABASE_URL"),
-        Port:  os.Getenv("PORT"),
-    }
+	return Config{
+		DBUrl: os.Getenv("DB_URL"),
+		Port:  os.Getenv("PORT"),
+	}
 }

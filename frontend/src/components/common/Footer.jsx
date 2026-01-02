@@ -48,15 +48,15 @@ const Footer = () => {
             <ul className="space-y-3 text-gray-400 text-sm">
               <li className="flex items-start space-x-2">
                 <MapPin size={18} className="mt-1 flex-shrink-0" />
-                <span>Jl. Angkasa I No.2, Jakarta Pusat 10720</span>
+                <span>Jl. ZA. Pagar Alam No.9 -11, Bandar Lampung 35132</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone size={18} />
-                <span>(021) 4246321</span>
+                <span>(021) 82828282</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Mail size={18} />
-                <span>info@bmkg.go.id</span>
+                <span>uti@teknokrat.ac.id</span>
               </li>
             </ul>
           </div>
@@ -64,7 +64,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm">
           <p>&copy; {new Date().getFullYear()} E-Library. All rights reserved.</p>
-          <p className="mt-1">Badan Meteorologi, Klimatologi, dan Geofisika</p>
+          <p className="mt-1">Universitas Teknokrat Indonesia</p>
         </div>
       </div>
     </footer>
