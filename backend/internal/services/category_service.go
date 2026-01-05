@@ -39,3 +39,11 @@ func (s *CategoryService) GetCategoryBySlug(slug string) (*models.Category, erro
 	}
 	return cat, nil
 }
+
+func (s *CategoryService) DeleteCategory(id int) error {
+	return s.categoryRepo.Delete(id)
+}
+
+func (s *CategoryService) CreateCategory(cat *models.Category) (*models.Category, error) {
+	return s.categoryRepo.Create(cat)
+}

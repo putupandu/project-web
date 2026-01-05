@@ -1,3 +1,4 @@
+// src/hooks/useBooks.js
 import { useState, useEffect } from 'react';
 import { bookService } from '../services/bookService';
 
@@ -16,11 +17,22 @@ export const useBooks = (initialFilters = {}) => {
     try {
       setLoading(true);
       setError(null);
+
       const response = await bookService.getAll(filters);
-      setBooks(response.data || []);
+
+      // FIX PENTING — cover harus ada dan tidak boleh null
+      const fixedBooks = (response.data || []).map((book) => {
+        return {
+          ...book,
+          cover: book.cover ?? null,   // pastikan cover tetap ada
+          file_url: book.file_url ?? null,
+        };
+      });
+
+      setBooks(fixedBooks);
       setMeta(response.meta || null);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to load books");
     } finally {
       setLoading(false);
     }
@@ -44,3 +56,4 @@ export const useBooks = (initialFilters = {}) => {
     refetch,
   };
 };
+  
