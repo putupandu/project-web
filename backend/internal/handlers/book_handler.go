@@ -1,18 +1,28 @@
 package handlers
 
 import (
-    "e-library/backend/internal/models"
-    "e-library/backend/internal/services"
-    "e-library/backend/internal/utils"
-    "encoding/json"
-    "net/http"
-    "strconv"
+	"e-library/backend/internal/models"
+	"e-library/backend/internal/services"
+	"e-library/backend/internal/utils"
+	"net/http"
+	"strconv"
 
-    "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
 
+// ================= URL DINAMIS (AMAN SAAT IP BERUBAH) =================
+func makePublicURL(r *http.Request, file string) string {
+	if file == "" {
+		return ""
+	}
 
+	scheme := "http"
+	if r.TLS != nil {
+		scheme = "https"
+	}
 
+	return scheme + "://" + r.Host + "/uploads/" + file
+}
 
 type BookHandler struct {
 	bookService *services.BookService
@@ -22,51 +32,18 @@ func NewBookHandler(bookService *services.BookService) *BookHandler {
 	return &BookHandler{bookService: bookService}
 }
 
+// ================= GET ALL BOOKS =================
 func (h *BookHandler) GetAllBooks(w http.ResponseWriter, r *http.Request) {
-	// Parse query parameters
-	filters := make(map[string]interface{})
-	
-	if search := r.URL.Query().Get("search"); search != "" {
-		filters["search"] = search
+	filters := map[string]interface{}{}
+
+	if s := r.URL.Query().Get("search"); s != "" {
+		filters["search"] = s
 	}
-	
-	if categoryID := r.URL.Query().Get("category_id"); categoryID != "" {
-		if id, err := strconv.Atoi(categoryID); err == nil {
+
+	if cid := r.URL.Query().Get("category_id"); cid != "" {
+		if id, err := strconv.Atoi(cid); err == nil {
 			filters["category_id"] = id
 		}
-	}
-	
-	if year := r.URL.Query().Get("year"); year != "" {
-		if y, err := strconv.Atoi(year); err == nil {
-			filters["year"] = y
-		}
-	}
-
-	// Pagination
-	page := 1
-	if p := r.URL.Query().Get("page"); p != "" {
-		if parsed, err := strconv.Atoi(p); err == nil && parsed > 0 {
-			page = parsed
-		}
-	}
-	filters["page"] = page
-
-	perPage := 12
-	if pp := r.URL.Query().Get("per_page"); pp != "" {
-		if parsed, err := strconv.Atoi(pp); err == nil && parsed > 0 {
-			perPage = parsed
-		}
-	}
-	filters["per_page"] = perPage
-	filters["limit"] = perPage
-	filters["offset"] = (page - 1) * perPage
-
-	// Sorting
-	if sort := r.URL.Query().Get("sort"); sort != "" {
-		filters["sort"] = sort
-	}
-	if order := r.URL.Query().Get("order"); order != "" {
-		filters["order"] = order
 	}
 
 	books, meta, err := h.bookService.GetAllBooks(filters)
@@ -74,6 +51,22 @@ func (h *BookHandler) GetAllBooks(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	for i := range books {
+
+		if books[i].Language == "" {
+		books[i].Language = "-"
+		}
+		if books[i].Cover != nil {
+			url := makePublicURL(r, *books[i].Cover)
+			books[i].Cover = &url
+		}
+		if books[i].FileURL != nil {
+			url := makePublicURL(r, *books[i].FileURL)
+			books[i].FileURL = &url
+		}
+	}
+	
 
 	utils.RespondJSON(w, http.StatusOK, models.Response{
 		Success: true,
@@ -83,9 +76,9 @@ func (h *BookHandler) GetAllBooks(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ================= GET BOOK BY ID =================
 func (h *BookHandler) GetBookByID(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id, err := strconv.Atoi(params["id"])
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid book ID")
 		return
@@ -93,8 +86,24 @@ func (h *BookHandler) GetBookByID(w http.ResponseWriter, r *http.Request) {
 
 	book, err := h.bookService.GetBookByID(id)
 	if err != nil {
-		utils.RespondError(w, http.StatusNotFound, err.Error())
+		utils.RespondError(w, http.StatusInternalServerError, err.Error())
 		return
+	}
+	if book == nil {
+		utils.RespondError(w, http.StatusNotFound, "Book not found")
+		return
+	}
+
+	if book.Cover != nil {
+		url := makePublicURL(r, *book.Cover)
+		book.Cover = &url
+	}
+	if book.FileURL != nil {
+		url := makePublicURL(r, *book.FileURL)
+		book.FileURL = &url
+	}
+	if book.Language == "" {
+	book.Language = "-"
 	}
 
 	utils.RespondJSON(w, http.StatusOK, models.Response{
@@ -104,16 +113,73 @@ func (h *BookHandler) GetBookByID(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ================= CREATE BOOK =================
 func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
-	var book models.Book
-	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
-		utils.RespondError(w, http.StatusBadRequest, "Invalid request body")
+	if err := r.ParseMultipartForm(50 << 20); err != nil {
+		utils.RespondError(w, http.StatusBadRequest, "Failed to parse form")
 		return
+	}
+
+	book := models.Book{
+	Title:       r.FormValue("title"),
+	Author:      r.FormValue("author"),
+	Description: r.FormValue("description"),
+	Language:    r.FormValue("language"),
+}
+
+
+	if y := r.FormValue("year"); y != "" {
+		if year, err := strconv.Atoi(y); err == nil {
+			book.Year = year
+		}
+	}
+
+	if cid := r.FormValue("category_id"); cid != "" {
+		if id, err := strconv.Atoi(cid); err == nil {
+			book.CategoryID = &id
+		}
+	}
+
+	saveUpload := func(key string) (*string, error) {
+		file, header, err := r.FormFile(key)
+		if err != nil {
+			return nil, nil
+		}
+		defer file.Close()
+
+		name, err := utils.SaveFile("uploads", header.Filename, file)
+		if err != nil {
+			return nil, err
+		}
+		return &name, nil
+	}
+
+	if c, err := saveUpload("cover"); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, err.Error())
+		return
+	} else if c != nil {
+		book.Cover = c
+	}
+
+	if f, err := saveUpload("file"); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, err.Error())
+		return
+	} else if f != nil {
+		book.FileURL = f
 	}
 
 	if err := h.bookService.CreateBook(&book); err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	if book.Cover != nil {
+		url := makePublicURL(r, *book.Cover)
+		book.Cover = &url
+	}
+	if book.FileURL != nil {
+		url := makePublicURL(r, *book.FileURL)
+		book.FileURL = &url
 	}
 
 	utils.RespondJSON(w, http.StatusCreated, models.Response{
@@ -123,18 +189,65 @@ func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ================= UPDATE BOOK =================
 func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id, err := strconv.Atoi(params["id"])
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid book ID")
 		return
 	}
 
-	var book models.Book
-	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
-		utils.RespondError(w, http.StatusBadRequest, "Invalid request body")
+	if err := r.ParseMultipartForm(50 << 20); err != nil {
+		utils.RespondError(w, http.StatusBadRequest, "Failed to parse form")
 		return
+	}
+
+	book := models.Book{
+	Title:       r.FormValue("title"),
+	Author:      r.FormValue("author"),
+	Description: r.FormValue("description"),
+	Language:    r.FormValue("language"),
+	}
+
+
+	if y := r.FormValue("year"); y != "" {
+		if year, err := strconv.Atoi(y); err == nil {
+			book.Year = year
+		}
+	}
+
+	if cid := r.FormValue("category_id"); cid != "" {
+		if cidInt, err := strconv.Atoi(cid); err == nil {
+			book.CategoryID = &cidInt
+		}
+	}
+
+	saveUpload := func(key string) (*string, error) {
+		file, header, err := r.FormFile(key)
+		if err != nil {
+			return nil, nil
+		}
+		defer file.Close()
+
+		name, err := utils.SaveFile("uploads", header.Filename, file)
+		if err != nil {
+			return nil, err
+		}
+		return &name, nil
+	}
+
+	if c, err := saveUpload("cover"); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, err.Error())
+		return
+	} else if c != nil {
+		book.Cover = c
+	}
+
+	if f, err := saveUpload("file"); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, err.Error())
+		return
+	} else if f != nil {
+		book.FileURL = f
 	}
 
 	if err := h.bookService.UpdateBook(id, &book); err != nil {
@@ -143,6 +256,16 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	book.ID = id
+
+	if book.Cover != nil {
+		url := makePublicURL(r, *book.Cover)
+		book.Cover = &url
+	}
+	if book.FileURL != nil {
+		url := makePublicURL(r, *book.FileURL)
+		book.FileURL = &url
+	}
+
 	utils.RespondJSON(w, http.StatusOK, models.Response{
 		Success: true,
 		Message: "Book updated successfully",
@@ -150,9 +273,9 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ================= DELETE BOOK =================
 func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id, err := strconv.Atoi(params["id"])
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid book ID")
 		return
@@ -169,16 +292,16 @@ func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ================= INCREMENT DOWNLOAD =================
 func (h *BookHandler) IncrementDownload(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id, err := strconv.Atoi(params["id"])
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid book ID")
 		return
 	}
 
 	if err := h.bookService.IncrementDownload(id); err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, err.Error())
+		utils.RespondError(w, http.StatusInternalServerError, "Failed to increment download count")
 		return
 	}
 
@@ -188,16 +311,16 @@ func (h *BookHandler) IncrementDownload(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
+// ================= INCREMENT VIEW =================
 func (h *BookHandler) IncrementView(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id, err := strconv.Atoi(params["id"])
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid book ID")
 		return
 	}
 
 	if err := h.bookService.IncrementView(id); err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, err.Error())
+		utils.RespondError(w, http.StatusInternalServerError, "Failed to increment view count")
 		return
 	}
 

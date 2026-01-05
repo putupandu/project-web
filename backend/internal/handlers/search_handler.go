@@ -1,22 +1,21 @@
 package handlers
 
 import (
-    "e-library/backend/internal/models"
-    "e-library/backend/internal/services"
-    "e-library/backend/internal/utils"
-    "net/http"
-    "strconv"
+	"e-library/backend/internal/models"
+	"e-library/backend/internal/services"
+	"e-library/backend/internal/utils"
+	"net/http"
+	"strconv"
 )
-
-
-
 
 type SearchHandler struct {
 	searchService *services.SearchService
 }
 
 func NewSearchHandler(searchService *services.SearchService) *SearchHandler {
-	return &SearchHandler{searchService: searchService}
+	return &SearchHandler{
+		searchService: searchService,
+	}
 }
 
 func (h *SearchHandler) Search(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +26,7 @@ func (h *SearchHandler) Search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filters := make(map[string]interface{})
-	
+
 	// Pagination
 	page := 1
 	if p := r.URL.Query().Get("page"); p != "" {
@@ -35,6 +34,7 @@ func (h *SearchHandler) Search(w http.ResponseWriter, r *http.Request) {
 			page = parsed
 		}
 	}
+
 	perPage := 12
 	filters["page"] = page
 	filters["per_page"] = perPage
@@ -45,6 +45,18 @@ func (h *SearchHandler) Search(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	// ✅ FIX UTAMA: URL cover & file DINAMIS (ikut host)
+	for i := range books {
+		if books[i].Cover != nil {
+			url := makePublicURL(r, *books[i].Cover)
+			books[i].Cover = &url
+		}
+		if books[i].FileURL != nil {
+			url := makePublicURL(r, *books[i].FileURL)
+			books[i].FileURL = &url
+		}
 	}
 
 	utils.RespondJSON(w, http.StatusOK, models.Response{

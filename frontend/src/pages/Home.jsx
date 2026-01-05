@@ -10,6 +10,8 @@ const Home = () => {
   const [latestBooks, setLatestBooks] = useState([]);
   const [popularBooks, setPopularBooks] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [totalBooks, setTotalBooks] = useState(0);
+  const [totalDownloads, setTotalDownloads] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,6 +22,11 @@ const Home = () => {
     try {
       setLoading(true);
       
+      // Fetch stats
+      const stats = await bookService.getStats();
+      setTotalBooks(stats.total);
+      setTotalDownloads(stats.totalDownloads);
+
       // Fetch latest books
       const latestResponse = await bookService.getAll({
         sort: 'created_at',
@@ -76,9 +83,7 @@ const Home = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1">Total Buku</p>
-              <p className="text-3xl font-bold text-blue-600">
-                {latestBooks.length > 0 ? '500+' : '0'}
-              </p>
+              <p className="text-3xl font-bold text-blue-600">{totalBooks}</p>
             </div>
             <Book className="text-blue-600" size={40} />
           </div>
@@ -98,7 +103,7 @@ const Home = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1">Total Unduhan</p>
-              <p className="text-3xl font-bold text-purple-600">10K+</p>
+              <p className="text-3xl font-bold text-purple-600">{totalDownloads}</p>
             </div>
             <TrendingUp className="text-purple-600" size={40} />
           </div>
@@ -108,9 +113,7 @@ const Home = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1">Buku Terbaru</p>
-              <p className="text-3xl font-bold text-orange-600">
-                {latestBooks.length}
-              </p>
+              <p className="text-3xl font-bold text-orange-600">{latestBooks.length}</p>
             </div>
             <Clock className="text-orange-600" size={40} />
           </div>
