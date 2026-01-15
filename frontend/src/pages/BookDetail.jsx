@@ -264,7 +264,7 @@ const BookDetail = () => {
                 <p className="text-gray-800">
   {book.language ? book.language : '-'}
 </p>
-
+//
               </div>
             </div>
 
@@ -287,3 +287,4 @@ const BookDetail = () => {
 };
 
 export default BookDetail;
+// page layout refinement 3
