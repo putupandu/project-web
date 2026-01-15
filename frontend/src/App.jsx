@@ -26,5 +26,5 @@ function App() {
     </Router>
   );
 }
-
-export default App;
+//
+export default App;/* minor adjustment 3 */
