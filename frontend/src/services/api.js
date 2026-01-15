@@ -19,7 +19,7 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
+//
 // Response interceptor
 api.interceptors.response.use(
   (response) => response.data,
@@ -29,4 +29,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default api;// logic refinement 3
