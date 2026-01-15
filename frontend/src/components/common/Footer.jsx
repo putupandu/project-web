@@ -72,3 +72,4 @@ const Footer = () => {
 };
 
 export default Footer;// common component improvement 2
+// common component improvement 6
