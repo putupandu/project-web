@@ -10,7 +10,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 )
-
+// auth
 type AuthService struct {
 	repo *repositories.UserRepository
 }
