@@ -64,3 +64,4 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 }
+// initial auth handler logic
