@@ -18,5 +18,5 @@ const ErrorMessage = ({ message, onRetry }) => {
     </div>
   );
 };
-
-export default ErrorMessage;
+//
+export default ErrorMessage;// common component improvement 4
