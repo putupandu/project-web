@@ -12,3 +12,4 @@ const Loading = ({ message = 'Loading...' }) => {
 //
 export default Loading;// common component improvement 3
 // common component improvement 7
+// common component improvement 11
