@@ -1,3 +1,4 @@
+// auth
 package handlers
 
 import (
