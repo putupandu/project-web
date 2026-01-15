@@ -8,3 +8,4 @@ export const searchService = {
     return response;
   },
 };// logic refinement 5
+// logic refinement 10
