@@ -115,7 +115,7 @@ const About = () => {
           </div>
         </div>
       </section>
-
+//
       {/* Contact */}
       <section className="bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Hubungi Kami</h2>
@@ -172,4 +172,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default About;// page layout refinement 4
