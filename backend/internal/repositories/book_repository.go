@@ -195,7 +195,7 @@ func (r *BookRepository) FindByID(id int) (*models.Book, error) {
 		&categoryID,
 		&categoryName,
 	)
-
+//
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
