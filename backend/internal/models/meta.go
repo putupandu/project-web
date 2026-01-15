@@ -1,6 +1,6 @@
 package models
 
-// 🔧 NEW: separate Meta struct to avoid duplication/conflict
+// 🔧 NEW: separate Meta struct to avoid duplication/conflict//
 type Meta struct {
 	Total      int `json:"total"`
 	Page       int `json:"page"`
