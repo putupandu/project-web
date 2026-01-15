@@ -39,7 +39,7 @@ const BookList = () => {
     searchParams.set('page', '1');
     setSearchParams(searchParams);
   };
-
+//
   // Page Change
   const handlePageChange = (page) => {
     updateFilters({ page });
@@ -164,3 +164,4 @@ const BookList = () => {
 };
 
 export default BookList;
+// page layout refinement 2
