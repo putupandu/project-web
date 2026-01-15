@@ -12,7 +12,7 @@ func RespondJSON(w http.ResponseWriter, status int, payload interface{}) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(payload)
 }
-
+//
 func RespondError(w http.ResponseWriter, status int, message string) {
 	RespondJSON(w, status, models.ErrorResponse{
 		Success: false,
