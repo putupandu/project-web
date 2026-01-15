@@ -1,7 +1,7 @@
 package models
 
 import "time"
-
+//
 type SavedBook struct {
 	ID        int       `json:"id"`
 	UserID    int       `json:"user_id"`
