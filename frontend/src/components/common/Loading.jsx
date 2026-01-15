@@ -9,5 +9,5 @@ const Loading = ({ message = 'Loading...' }) => {
     </div>
   );
 };
-
-export default Loading;
+//
+export default Loading;// common component improvement 3
