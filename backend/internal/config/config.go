@@ -26,3 +26,4 @@ func LoadConfig() Config {
 		BaseURL: os.Getenv("BASE_URL"),
 	}
 }
+// load environment configuration
