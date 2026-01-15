@@ -26,7 +26,7 @@ const BookCard = ({ book }) => {
     No cover
   </div>
 )}
-
+//
 
         
         {/* Year Badge */}
@@ -53,4 +53,4 @@ const BookCard = ({ book }) => {
   );
 };
 
-export default BookCard;
+export default BookCard;// books tweak 2
