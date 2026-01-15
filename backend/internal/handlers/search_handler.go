@@ -11,7 +11,7 @@ import (
 type SearchHandler struct {
 	searchService *services.SearchService
 }
-
+//
 func NewSearchHandler(searchService *services.SearchService) *SearchHandler {
 	return &SearchHandler{
 		searchService: searchService,
