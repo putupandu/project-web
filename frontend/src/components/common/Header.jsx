@@ -78,3 +78,4 @@ const Header = () => {
 };
 
 export default Header;// common component improvement 1
+// common component improvement 5
